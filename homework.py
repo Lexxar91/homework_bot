@@ -67,7 +67,7 @@ def parse_status(homework):
         logging.warning("Решение по домашний работе отсувствует")
     logging.info(f"Статус изменился на {verdict}")
 
-    return f"Изменился статус проверки работы '{homework_name}'. {verdict}"
+    return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
 def check_response(response):
