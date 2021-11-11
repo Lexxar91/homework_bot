@@ -30,6 +30,7 @@ HOMEWORK_STATUSES = {
 
 HEADERS = {"Authorization": f"OAuth {PRACTICUM_TOKEN}"}
 
+
 class MyOwnException(Exception):
     pass
 
@@ -38,7 +39,7 @@ def send_message(bot, message):
     """Отправка сообщения боту."""
     try:
         logging.info(f"Отправленно сообщение {message}")
-        return bot.send_message(chat_id=TELEGRAM_CHAT_ID , text=message)
+        return bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
     except Exception as err:
         logging.error(f"Cообщение не отправлено: {err}", exc_info=True)
 
@@ -62,20 +63,20 @@ def get_api_answer(current_timestamp):
 
 def parse_status(homework):
     """Парсим статус работы."""
-    homework_status  = HOMEWORK_STATUSES[homework.get("status")]
+    homework_status = HOMEWORK_STATUSES[homework.get("status")]
     homework_name = homework.get("homework_name")
     if homework_name is None:
         logging.warning("Домашняя работа отсувствует")
     if homework_status is None:
         logging.warning("Решение по домашний работе отсувствует")
     logging.info(f"Статус изменился на {homework_status}")
-   
-    return f'Изменился статус проверки работы "{homework_name}". {homework_status}'
 
+    return f'Изменился статус проверки работы "{homework_name}". {homework_status}'
 
 def check_tokens():
     """Проверка доступности переменных окружения."""
-    if PRACTICUM_TOKEN is None or TELEGRAM_TOKEN is None or TELEGRAM_CHAT_ID is None:
+    if PRACTICUM_TOKEN is None or\
+            TELEGRAM_TOKEN is None or TELEGRAM_CHAT_ID is None:
         return False
     return True
 
