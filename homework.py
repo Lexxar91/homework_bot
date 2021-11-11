@@ -70,13 +70,13 @@ def parse_status(homework):
     homework_name = homework.get("homework_name")
 
     if homework_status not in HOMEWORK_STATUSES:
-        return logging.error("Такого статуса не существует.")
+        logging.error("Такого статуса не существует.")
 
     if homework_name is None:
-        return logging.warning("Домашняя работа отсувствует")
+        logging.warning("Домашняя работа отсувствует")
 
     if homework_status is None:
-        return logging.warning("Решение по домашний работе отсувствует")
+        logging.warning("Решение по домашний работе отсувствует")
     logging.info(f"Статус изменился на {homework_status}")
 
     return (f'Изменился статус проверки работы "{homework_name}".'
