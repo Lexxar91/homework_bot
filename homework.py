@@ -3,6 +3,7 @@ import requests
 import telegram
 import time
 import os
+import sys
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,7 +26,7 @@ ENDPOINT = "https://practicum.yandex.ru/api/user_api/homework_statuses/"
 HOMEWORK_STATUSES = {
     "approved": "Работа проверена: ревьюеру всё понравилось. Ура!",
     "reviewing": "Работа взята на проверку ревьюером.",
-    'rejected': 'Работа проверена: у ревьюера есть замечания.'
+    "rejected": "Работа проверена: у ревьюера есть замечания."
 }
 
 HEADERS = {"Authorization": f"OAuth {PRACTICUM_TOKEN}"}
@@ -67,41 +68,46 @@ def parse_status(homework):
     """Парсим статус работы."""
     homework_status = HOMEWORK_STATUSES[homework.get("status")]
     homework_name = homework.get("homework_name")
+
+    if homework_status not in HOMEWORK_STATUSES:
+        return logging.error("Такого статуса не существует.")
+
     if homework_name is None:
-        logging.warning("Домашняя работа отсувствует")
+        return logging.warning("Домашняя работа отсувствует")
+
     if homework_status is None:
-        logging.warning("Решение по домашний работе отсувствует")
+        return logging.warning("Решение по домашний работе отсувствует")
     logging.info(f"Статус изменился на {homework_status}")
 
-    return f'Изменился статус проверки работы "{homework_name}".' \
-           f'{homework_status}'
+    return (f'Изменился статус проверки работы "{homework_name}".'
+            f'{homework_status}')
 
 
 def check_tokens():
     """Проверка доступности переменных окружения."""
-    if PRACTICUM_TOKEN is None or\
-            TELEGRAM_TOKEN is None or \
-            TELEGRAM_CHAT_ID is None:
+    if (PRACTICUM_TOKEN is None
+        or TELEGRAM_TOKEN is None
+            or TELEGRAM_CHAT_ID is None):
         return False
     return True
 
 
 def check_response(response):
     """Проверка ответа с сервера."""
-    if response['homeworks'] is None:
+    if response["homeworks"] is None:
         raise MyOwnException("Задания не обнаружены")
 
-    if not isinstance(response['homeworks'], list):
+    if not isinstance(response["homeworks"], list):
         raise MyOwnException("response['homeworks'] не является списком")
     logging.debug("API проверен на корректность")
-    return response['homeworks']
+    return response["homeworks"]
 
 
 def main():
     """Король функций."""
     if not check_tokens():
         logging.critical("Отсутствует переменная(-ные) окружения")
-        return 0
+        sys.exit()
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
     while True:
@@ -116,7 +122,7 @@ def main():
         except Exception as error:
             logging.error("бот не доступен")
             bot.send_message(
-                chat_id=TELEGRAM_CHAT_ID, text=f'Что-то пошло не так: {error}'
+                chat_id=TELEGRAM_CHAT_ID, text=f"Что-то пошло не так: {error}"
             )
             time.sleep(RETRY_TIME)
 
