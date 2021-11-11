@@ -33,6 +33,7 @@ HEADERS = {"Authorization": f"OAuth {PRACTICUM_TOKEN}"}
 
 class MyOwnException(Exception):
     """Кастомное исключения."""
+
     pass
 
 
