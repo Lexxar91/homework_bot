@@ -32,6 +32,7 @@ HEADERS = {"Authorization": f"OAuth {PRACTICUM_TOKEN}"}
 
 
 class MyOwnException(Exception):
+    """Кастомное исключения."""
     pass
 
 
@@ -71,12 +72,15 @@ def parse_status(homework):
         logging.warning("Решение по домашний работе отсувствует")
     logging.info(f"Статус изменился на {homework_status}")
 
-    return f'Изменился статус проверки работы "{homework_name}". {homework_status}'
+    return f'Изменился статус проверки работы "{homework_name}".' \
+           f'{homework_status}'
+
 
 def check_tokens():
     """Проверка доступности переменных окружения."""
     if PRACTICUM_TOKEN is None or\
-            TELEGRAM_TOKEN is None or TELEGRAM_CHAT_ID is None:
+            TELEGRAM_TOKEN is None or \
+            TELEGRAM_CHAT_ID is None:
         return False
     return True
 
