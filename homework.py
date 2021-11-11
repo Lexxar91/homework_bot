@@ -20,67 +20,67 @@ TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('CHAT_ID')
 
 RETRY_TIME = 600
-ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
+ENDPOINT = "https://practicum.yandex.ru/api/user_api/homework_statuses/"
 
 HOMEWORK_STATUSES = {
-    'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
-    'reviewing': 'Работа взята на проверку ревьюером.',
-    'rejected': 'Работа проверена, в ней нашлись ошибки.'
+    "approved": "Работа проверена: ревьюеру всё понравилось. Ура!",
+    "reviewing": "Работа взята на проверку ревьюером.",
+    "rejected": "Работа проверена, в ней нашлись ошибки."
 }
 
-HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
+HEADERS = {"Authorization": f"OAuth {PRACTICUM_TOKEN}"}
 
 
 def send_message(bot, message):
     """Отправка сообщения боту."""
     try:
-        logging.info(f'Отправленно сообщение {message}')
+        logging.info(f"Отправленно сообщение {message}")
         return bot.send_message(chat_id=CHAT_ID, text=message)
     except Exception as err:
-        logging.error(f'Cообщение не отправлено: {err}', exc_info=True)
+        logging.error(f"Cообщение не отправлено: {err}", exc_info=True)
 
 
 def get_api_answer(url, current_timestamp):
     """Запрос к API сервера Яндекс."""
-    payload = {'from_date': current_timestamp}
+    payload = {"from_date": current_timestamp}
 
     try:
         homework = requests.get(url, headers=HEADERS, params=payload)
         if homework.status_code != 200:
             homework.raise_for_status()
-        logging.info('Все отлично')
+        logging.info("Все отлично")
         return homework.json()
 
     except requests.exceptions.RequestException:
         logging.error(
-            'Что-то пошло не так при подключении'
-            'к серверу', exc_info=True)
+            "Что-то пошло не так при подключении"
+            "к серверу", exc_info=True)
 
 
 def parse_status(homework):
     """Парсим статус работы."""
-    verdict = HOMEWORK_STATUSES[homework.get('status')]
-    homework_name = homework.get('homework_name')
-    if not homework_name:
+    verdict = HOMEWORK_STATUSES[homework.get("status")]
+    homework_name = homework.get("homework_name")
+    if homework_name is None:
         logging.warning("Домашняя работа отсувствует")
-    if not verdict:
+    if verdict is None:
         logging.warning("Решение по домашний работе отсувствует")
-    logging.info(f'Статус изменился на {verdict}')
+    logging.info(f"Статус изменился на {verdict}")
 
-    return f'Изменился статус проверки работы "{homework_name}". {verdict}'
+    return f"Изменился статус проверки работы '{homework_name}'. {verdict}"
 
 
 def check_response(response):
     """Проверка ответа с сервера."""
-    homeworks = response.get('homeworks')
+    homeworks = response.get("homeworks")
     if not homeworks:
-        logging.warning('homeworks не найден')
+        logging.warning("homeworks не найден")
     for homework in homeworks:
-        status = homework.get('status')
+        status = homework.get("status")
         if status in HOMEWORK_STATUSES:
-            return homework
+            return homeworks
         else:
-            raise Exception('Нет подходящего статуса')
+            raise Exception("Нет подходящего статуса")
     return homeworks
 
 
@@ -98,7 +98,7 @@ def main():
                     send_message(bot, parse_status_result)
             time.sleep(RETRY_TIME)
         except Exception as error:
-            logging.error('бот не доступен')
+            logging.error("бот не доступен")
             bot.send_message(
                 chat_id=CHAT_ID, text=f'Что-то пошло не так: {error}'
             )
