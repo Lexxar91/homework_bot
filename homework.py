@@ -66,21 +66,23 @@ def get_api_answer(current_timestamp):
 
 def parse_status(homework):
     """Парсим статус работы."""
-    homework_status = HOMEWORK_STATUSES[homework.get("status")]
-    homework_name = homework.get("homework_name")
+    homework_status = homework.get("status")
 
     if homework_status not in HOMEWORK_STATUSES:
-        logging.error("Такого статуса не существует.")
+        logging.error(f'Такого статуса не существует - "{homework_status}"')
+
+    verdict = HOMEWORK_STATUSES[homework_status]
+    homework_name = homework.get("homework_name")
 
     if homework_name is None:
         logging.warning("Домашняя работа отсувствует")
 
     if homework_status is None:
         logging.warning("Решение по домашний работе отсувствует")
-    logging.info(f"Статус изменился на {homework_status}")
+    logging.info(f"Статус изменился на {verdict}")
 
     return (f'Изменился статус проверки работы "{homework_name}".'
-            f'{homework_status}')
+            f'{verdict}')
 
 
 def check_tokens():
